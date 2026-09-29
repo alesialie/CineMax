@@ -6,7 +6,7 @@ import java.time.LocalDate;
  * Rappresenta un utente registrato sulla piattaforma CineMax: puo essere
  * un cliente, un proiezionista o un bigliettaio, a seconda del {@link Ruolo}.
  *
- * @author Sara Parenzan
+ * @author Daria Alesia Ilie
  */
 public class Utente {
 

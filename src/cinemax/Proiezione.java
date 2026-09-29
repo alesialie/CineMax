@@ -1,4 +1,3 @@
-
 package cinemax;
 
 import java.time.LocalDateTime;
@@ -6,8 +5,7 @@ import java.time.LocalDateTime;
 /**
  * Rappresenta una proiezione di un {@link Film} in una data e ora precise,
  * con un costo del biglietto associato.
- *
- * @author Ranya El Kachtaoui
+ * @author Elisabetta Della Moretta
  */
 public class Proiezione {
 

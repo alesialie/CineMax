@@ -28,7 +28,7 @@ public class CineMax {
             System.out.println("=== CineMax ===");
             System.out.println("1. Login");
             System.out.println("2. Registrati");
-            System.out.println("3. Continua come guest");
+            //System.out.println("3. Continua come guest");
             System.out.println("0. Esci");
             System.out.print("Scelta: ");
 

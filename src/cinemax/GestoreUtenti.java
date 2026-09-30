@@ -4,8 +4,24 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * @author Daria Alesia Ilie
+ * **/
 
 public class GestoreUtenti {
+
+    private List<Utente> listaUtenti;
+
+    // Costruttore: carica la lista degli utenti esistenti dal file CSV
+    public GestoreUtenti() {
+        this.listaUtenti = GestoreDati.caricaUtenti("utenti.csv");
+        if (this.listaUtenti == null) {
+            this.listaUtenti = new ArrayList<>();
+        }
+    }
 
     public void registra(String nome, String cognome, String username, String password, LocalDate dataNascita, String domicilio, Ruolo ruolo){
 
@@ -16,6 +32,13 @@ public class GestoreUtenti {
                 dataNascita == null || ruolo == null) {
 
             throw new IllegalArgumentException("Tutti i campi obbligatori devono essere compilati.");
+        }
+
+        boolean usernameEsistente = listaUtenti.stream()
+                .anyMatch(u -> u.getUsername().equalsIgnoreCase(username));
+
+        if (usernameEsistente) {
+            throw new IllegalArgumentException("Username già esistente.");
         }
 
         LocalDate oggi = LocalDate.now();
@@ -30,6 +53,9 @@ public class GestoreUtenti {
         String passwordCifrata = cifra(password);
         Utente nuovoUtente = new Utente(nome, cognome, username, passwordCifrata, dataNascita, domicilio, ruolo);
 
+        listaUtenti.add(nuovoUtente);
+
+        GestoreDati.salvaUtenti("utenti.csv", listaUtenti);
     }
 
     public static String cifra(String passwordInChiaro) {
@@ -44,6 +70,10 @@ public class GestoreUtenti {
         } catch (NoSuchAlgorithmException e) {
             throw new IllegalStateException("Algoritmo SHA-256 non disponibile", e);
         }
+    }
+
+    public List<Utente> getListaUtenti() {
+        return listaUtenti;
     }
 
     public Ruolo login(){

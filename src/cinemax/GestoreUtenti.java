@@ -46,7 +46,7 @@ public class GestoreUtenti {
             throw new IllegalArgumentException("Data di nascita non valida.");
         }
 
-        if (dataNascita.plusYears(18).isAfter(LocalDate.now())) {
+        if (dataNascita.plusYears(18).isAfter(oggi)) {
             throw new IllegalArgumentException("L'utente deve avere almeno 18 anni per registrarsi.");
         }
 
@@ -73,10 +73,29 @@ public class GestoreUtenti {
     }
 
     public List<Utente> getListaUtenti() {
-        return listaUtenti;
+        return List.copyOf(listaUtenti);
     }
 
-    public Ruolo login(){
+    public Ruolo login(String username, String password) {
+
+        if (username == null || username.isBlank() ||
+                password == null || password.isBlank()) {
+            return null;
+        }
+
+        String passwordCifrataInput = cifra(password);
+
+        for (Utente u : listaUtenti) {
+
+            if (u.getUsername().equalsIgnoreCase(username)) {
+
+                if (u.getPasswordCifrata().equals(passwordCifrataInput)) {
+                    return u.getRuolo();
+                }
+
+                return null;
+            }
+        }
         return null;
     }
 }

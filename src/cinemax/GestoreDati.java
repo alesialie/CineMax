@@ -8,6 +8,7 @@ import java.io.PrintWriter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.time.LocalDateTime;
 
 /**
  * Gestisce la lettura e la scrittura dei dati su file CSV nella cartella "data",
@@ -47,8 +48,7 @@ public class GestoreDati {
     }
 
     /**
-     * Carica gli utenti da un file CSV specificato (es. "utenti.csv").
-     *
+     * Carica gli utenti da un file CSV specificato (es. "utenti.csv")
      * @param nomeFile nome del file da leggere
      * @return una lista di oggetti Utente caricati dal file
      */
@@ -83,6 +83,62 @@ public class GestoreDati {
             // Se il file non esiste ancora, restituisce la lista vuota
         }
         return utenti;
+    }
+
+    public static void salvaProiezioni(String nomeFile, List<Proiezione> proiezioni) {
+        String percorso = DIRECTORY_DATI + nomeFile;
+        try (PrintWriter pw = new PrintWriter(new FileWriter(percorso))) {
+            for (Proiezione p : proiezioni) {
+                Film f = p.getFilm();
+                String riga = String.join(",",
+                        gestisciVirgole(f.getTitolo()),
+                        gestisciVirgole(f.getGenere()),
+                        gestisciVirgole(f.getRegista()),
+                        String.valueOf(f.getAnno()),
+                        String.valueOf(f.getDurataMinuti()),
+                        String.valueOf(f.getEtaMinima()),
+                        p.getDataOra().toString(),
+                        String.valueOf(p.getCostoBiglietto())
+                );
+                pw.println(riga);
+            }
+        } catch (IOException e) {
+            System.out.println("Errore durante il salvataggio del file " + nomeFile + ": " + e.getMessage());
+        }
+    }
+
+    public static List<Proiezione> caricaProiezioni(String nomeFile) {
+        List<Proiezione> proiezioni = new ArrayList<>();
+        String percorso = DIRECTORY_DATI + nomeFile;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(percorso))) {
+            String riga;
+            while ((riga = br.readLine()) != null) {
+                if (riga.trim().isEmpty()) {
+                    continue;
+                }
+                String[] parti = riga.split(",", -1);
+                if (parti.length >= 8) {
+                    String titolo = parti[0];
+                    String genere = parti[1];
+                    String regista = parti[2];
+                    int anno = Integer.parseInt(parti[3]);
+                    int durataMinuti = Integer.parseInt(parti[4]);
+                    int etaMinima = Integer.parseInt(parti[5]);
+
+                    Film film = new Film(titolo, genere, regista, anno, durataMinuti, etaMinima);
+
+                    LocalDateTime dataOra = LocalDateTime.parse(parti[6]);
+                    double costoBiglietto = Double.parseDouble(parti[7]);
+
+                    Proiezione proiezione = new Proiezione(film, dataOra, costoBiglietto);
+                    proiezioni.add(proiezione);
+                }
+            }
+        } catch (IOException e) {
+            // File non ancora esistente, ritorna lista vuota
+        }
+        return proiezioni;
     }
 
     /**

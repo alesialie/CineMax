@@ -1,7 +1,2 @@
-Mario,Rossi,proiezionista1,pwd123,1980-05-10,Varese,PROIEZIONISTA
-Anna,Neri,proiezionista2,pwd123,1985-08-22,Como,PROIEZIONISTA
-Luigi,Verdi,bigliettaio1,pwd123,1990-02-15,Varese,BIGLIETTAIO
-Giulia,Bianchi,bigliettaio2,pwd123,1992-06-18,Como,BIGLIETTAIO
-Paolo,Gialli,bigliettaio3,pwd123,1988-11-30,Varese,BIGLIETTAIO
-Elena,Rossi,bigliettaio4,pwd123,1995-01-05,Como,BIGLIETTAIO
-Marco,Ferrari,bigliettaio5,pwd123,1991-07-20,Varese,BIGLIETTAIO
+Mario,Rossi,mario.rossi,ef92b778bafe771e89245b89ecbc08a44a4e166c06659911881f383d4473e94f,1990-05-12,Varese,CLIENTE
+Daria,Ilie,daria.ilie,66280c9c89ac885af3836a9b72731639c7a28e4f7ced9dbfe6afa46d04c67ada,2005-02-26,Fagnano,BIGLIETTAIO

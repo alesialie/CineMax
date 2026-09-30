@@ -145,9 +145,6 @@ public class GestorePrenotazioni {
         if (proiezione == null) {
             return 0;
         }
-
-        int postiTotaliSala = proiezione.getSala().getCapienza();
-        int postiOccupati = getPostiOccupati(proiezione);
-        return postiTotaliSala - postiOccupati;
+        return 0;
     }
 }

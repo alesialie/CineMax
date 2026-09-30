@@ -141,6 +141,77 @@ public class GestoreDati {
         return proiezioni;
     }
 
+    public static void salvaPrenotazioni(String nomeFile, List<Prenotazione> prenotazioni) {
+        String percorso = DIRECTORY_DATI + nomeFile;
+        try (PrintWriter pw = new PrintWriter(new FileWriter(percorso))) {
+            for (Prenotazione pr : prenotazioni) {
+                String riga = String.join(",",
+                        gestisciVirgole(pr.getCodice()),
+                        gestisciVirgole(pr.getCliente().getUsername()),
+                        gestisciVirgole(pr.getProiezione().getFilm().getTitolo()),
+                        pr.getProiezione().getDataOra().toString(),
+                        String.valueOf(pr.getNumeroPosti())
+                );
+                pw.println(riga);
+            }
+        } catch (IOException e) {
+            System.out.println("Errore durante il salvataggio del file " + nomeFile + ": " + e.getMessage());
+        }
+    }
+
+    /**
+     * Carica le prenotazioni. Nota: ha bisogno della lista degli utenti e delle proiezioni
+     * già caricate per associare gli oggetti corretti (`Utente` e `Proiezione`).
+     */
+    public static List<Prenotazione> caricaPrenotazioni(String nomeFile, List<Utente> utenti, List<Proiezione> proiezioni) {
+        List<Prenotazione> prenotazioni = new ArrayList<>();
+        String percorso = DIRECTORY_DATI + nomeFile;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(percorso))) {
+            String riga;
+            while ((riga = br.readLine()) != null) {
+                if (riga.trim().isEmpty()) {
+                    continue;
+                }
+                String[] parti = riga.split(",", -1);
+                if (parti.length >= 5) {
+                    String codice = parti[0];
+                    String usernameCliente = parti[1];
+                    String titoloFilm = parti[2];
+                    LocalDateTime dataOraProiezione = LocalDateTime.parse(parti[3]);
+                    int numeroPosti = Integer.parseInt(parti[4]);
+
+                    // Ricerca l'utente corrispondente per username
+                    Utente clienteTrovato = null;
+                    for (Utente u : utenti) {
+                        if (u.getUsername().equalsIgnoreCase(usernameCliente)) {
+                            clienteTrovato = u;
+                            break;
+                        }
+                    }
+
+                    // Ricerca la proiezione corrispondente per titolo e data/ora
+                    Proiezione proiezioneTrovata = null;
+                    for (Proiezione p : proiezioni) {
+                        if (p.getFilm().getTitolo().equalsIgnoreCase(titoloFilm) && p.getDataOra().equals(dataOraProiezione)) {
+                            proiezioneTrovata = p;
+                            break;
+                        }
+                    }
+
+                    // Se entrambi esistono, crea e aggiunge la prenotazione
+                    if (clienteTrovato != null && proiezioneTrovata != null) {
+                        Prenotazione pr = new Prenotazione(codice, clienteTrovato, proiezioneTrovata, numeroPosti);
+                        prenotazioni.add(pr);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            // File non ancora esistente, ritorna lista vuota
+        }
+        return prenotazioni;
+    }
+
     /**
      * Metodo di supporto per evitare che eventuali virgole all'interno
      * di stringhe di testo spezzino il formato CSV (racchiude tra virgolette se necessario).

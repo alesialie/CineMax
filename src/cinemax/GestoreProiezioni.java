@@ -1,5 +1,7 @@
 package cinemax;
 
+import org.w3c.dom.stylesheets.LinkStyle;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -205,7 +207,13 @@ public class GestoreProiezioni {
         }
         return proiezioni.remove(proiezione);
     }
-    public List<Proiezione> getProiezioni() {
-        return proiezioni;
+    /**
+     * metodi per collegarsi al gestoreDati
+     */
+    /**
+     * Salva la lista delle proiezioni richiamando GestoreDati
+     */
+    public void salvaDati() {
+        GestoreDati.salvaProiezioni("proiezioni.csv", this.proiezioni);
     }
 }

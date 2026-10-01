@@ -7,7 +7,7 @@ import java.time.LocalDate;
  * un cliente, un proiezionista o un bigliettaio, a seconda del {@link Ruolo}.
  *
  * @author Daria Alesia Ilie
- */
+ * */
 public class Utente {
 
     private String nome;

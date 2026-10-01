@@ -145,7 +145,9 @@ public class GestorePrenotazioni {
         if (proiezione == null) {
             return 0;
         }
-        return 0;
+        // Capienza massima fissa della sala (es. 200 come in GestoreProiezioni)
+        int capienzaSala = 200;
+        return capienzaSala - getPostiOccupati(proiezione);
     }
 
     // Metodo da aggiungere dentro GestorePrenotazioni

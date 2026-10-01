@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 
 /**
  * Classe principale dell'applicazione CineMax. Contiene il metodo main
@@ -24,6 +25,7 @@ public class CineMax {
 
         List<Proiezione> proiezioni = GestoreDati.caricaProiezioni("proiezioni.csv");
         GestoreProiezioni gestoreProiezioni = new GestoreProiezioni(proiezioni);
+        GestoreUtenti gestoreUtenti = new GestoreUtenti();
 
         // =====================================================================
         // MENU PRINCIPALE
@@ -147,4 +149,168 @@ public class CineMax {
         }
         return null;
     }
+    /**
+     * Sottomenu riservato agli utenti registrati con ruolo CLIENTE.
+     */
+    private static void menuCliente(Scanner scanner, Utente cliente, GestoreProiezioni gestoreProiezioni, GestorePrenotazioni gestorePrenotazioni) {
+        boolean inMenuCliente = true;
+
+        while (inMenuCliente) {
+            System.out.println("\n=== AREA CLIENTE ===");
+            System.out.println("1. Nuova prenotazione");
+            System.out.println("2. Prenotazioni attive");
+            System.out.println("3. Annulla prenotazione");
+            System.out.println("0. Logout");
+            System.out.print("Scelta: ");
+
+            String scelta = scanner.nextLine();
+
+            switch (scelta) {
+                case "1":
+                    nuovaPrenotazione(scanner, cliente, gestoreProiezioni, gestorePrenotazioni);
+                    break;
+
+                case "2":
+                    mostraPrenotazioniCliente(cliente, gestorePrenotazioni);
+                    break;
+
+                case "3":
+                    annullaPrenotazioneCliente(scanner, cliente, gestorePrenotazioni);
+                    break;
+
+                case "0":
+                    inMenuCliente = false;
+                    System.out.println("Logout effettuato.");
+                    break;
+
+                default:
+                    System.out.println("Scelta non valida.");
+            }
+        }
+    }
+
+    /**
+     * Procedura per effettuare una nuova prenotazione.
+     */
+    private static void nuovaPrenotazione(Scanner scanner, Utente cliente, GestoreProiezioni gestoreProiezioni, GestorePrenotazioni gestorePrenotazioni) {
+        List<Proiezione> proiezioni = gestoreProiezioni.getProiezioni();
+
+        if (proiezioni == null || proiezioni.isEmpty()) {
+            System.out.println("Nessuna proiezione disponibile al momento.");
+            return;
+        }
+
+        System.out.println("\n--- NUOVA PRENOTAZIONE ---");
+        System.out.println("Elenco proiezioni disponibili:\n");
+
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+        for (int i = 0; i < proiezioni.size(); i++) {
+            Proiezione p = proiezioni.get(i);
+            int postiDisp = gestorePrenotazioni.getPostiDisponibili(p);
+            System.out.println((i + 1) + ". " + p.getFilm().getTitolo() +
+                    " | Data/Ora: " + p.getDataOra().format(fmt) +
+                    " | Prezzo: €" + p.getCostoBiglietto() +
+                    " | Posti disponibili: " + postiDisp);
+        }
+
+        try {
+            System.out.print("\nInserisci il numero corrispondente alla proiezione (0 per annullare): ");
+            int sceltaIndice = Integer.parseInt(scanner.nextLine());
+
+            if (sceltaIndice == 0) {
+                return;
+            }
+
+            if (sceltaIndice < 1 || sceltaIndice > proiezioni.size()) {
+                System.out.println("Selezione non valida.");
+                return;
+            }
+
+            Proiezione proiezioneScelta = proiezioni.get(sceltaIndice - 1);
+
+            System.out.print("Inserisci il numero di posti da prenotare: ");
+            int numeroPosti = Integer.parseInt(scanner.nextLine());
+
+            // Generazione automatica di un codice univoco
+            String codicePrenotazione = "PREN-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
+
+            boolean esito = gestorePrenotazioni.effettuaPrenotazione(codicePrenotazione, cliente, proiezioneScelta, numeroPosti);
+
+            if (esito) {
+                gestorePrenotazioni.salvaPrenotazioni();
+                System.out.println("\nPrenotazione completata con successo!");
+                System.out.println("Codice Prenotazione: " + codicePrenotazione);
+                System.out.println("Costo Totale: €" + (proiezioneScelta.getCostoBiglietto() * numeroPosti));
+            } else {
+                System.out.println("\nImpossibile effettuare la prenotazione. Verificare la disponibilità dei posti o l'orario della proiezione.");
+            }
+
+        } catch (NumberFormatException e) {
+            System.out.println("Errore: Inserire un valore numerico valido.");
+        }
+    }
+
+    /**
+     * Stampa le prenotazioni attive associate al cliente loggato.
+     */
+    private static void mostraPrenotazioniCliente(Utente cliente, GestorePrenotazioni gestorePrenotazioni) {
+        List<Prenotazione> miePrenotazioni = gestorePrenotazioni.getPrenotazioniPerUtente(cliente);
+
+        System.out.println("\n--- LE MIE PRENOTAZIONI ATTIVE ---");
+
+        if (miePrenotazioni.isEmpty()) {
+            System.out.println("Non hai nessuna prenotazione attiva.");
+            return;
+        }
+
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+
+        for (Prenotazione p : miePrenotazioni) {
+            System.out.println("Codice: " + p.getCodice() +
+                    " | Film: " + p.getProiezione().getFilm().getTitolo() +
+                    " | Data/Ora: " + p.getProiezione().getDataOra().format(fmt) +
+                    " | Posti: " + p.getNumeroPosti() +
+                    " | Totale: €" + p.getCostoTotale());
+        }
+    }
+
+    /**
+     * Procedura per permettere al cliente di annullare una propria prenotazione esistente.
+     */
+    private static void annullaPrenotazioneCliente(Scanner scanner, Utente cliente, GestorePrenotazioni gestorePrenotazioni) {
+        System.out.println("\n--- ANNULLA PRENOTAZIONE ---");
+        mostraPrenotazioniCliente(cliente, gestorePrenotazioni);
+
+        List<Prenotazione> miePrenotazioni = gestorePrenotazioni.getPrenotazioniPerUtente(cliente);
+        if (miePrenotazioni.isEmpty()) {
+            return;
+        }
+
+        System.out.print("\nInserisci il codice della prenotazione da annullare (INVIO per annullare): ");
+        String codice = scanner.nextLine().trim();
+
+        if (codice.isEmpty()) {
+            return;
+        }
+
+        Prenotazione daAnnullare = gestorePrenotazioni.cercaPerCodice(codice);
+
+        if (daAnnullare == null) {
+            System.out.println("Nessuna prenotazione trovata con il codice specificato.");
+            return;
+        }
+
+        boolean esito = gestorePrenotazioni.annullaPrenotazione(cliente, daAnnullare);
+
+        if (esito) {
+            gestorePrenotazioni.salvaPrenotazioni();
+            System.out.println("Prenotazione annullata correttamente.");
+        } else {
+            System.out.println("Impossibile annullare la prenotazione (potrebbe appartenere a un altro utente o essere riferita a una proiezione già passata).");
+        }
+    }
+
+
+
 }

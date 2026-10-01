@@ -6,16 +6,20 @@ import java.util.List;
 
 public class GestorePrenotazioni {
 
+    //lista che memorizza tutti gli oggetti Prenotazione, final perchè non deve essere sovrascritta
     private final List<Prenotazione> prenotazioni;
 
+    //costruttore che crea una lista vuota
     public GestorePrenotazioni() {
         this.prenotazioni = new ArrayList<>();
     }
 
+    //prende le prenotazioni che esistono già nel csv, se è vuoto crea una lista vuota
     public GestorePrenotazioni(List<Prenotazione> prenotazioni) {
         this.prenotazioni = (prenotazioni != null) ? new ArrayList<>(prenotazioni) : new ArrayList<>();
     }
 
+    //restituisce una copia della lista delle prenotazioni attive
     public List<Prenotazione> getPrenotazioni() {
         return new ArrayList<>(prenotazioni);
     }

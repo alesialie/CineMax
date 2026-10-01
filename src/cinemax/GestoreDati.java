@@ -80,7 +80,7 @@ public class GestoreDati {
                 }
             }
         } catch (IOException e) {
-            // Se il file non esiste ancora, restituisce la lista vuota
+            System.out.println("Errore durante il caricamento dell'utente " + nomeFile + ": " + e.getMessage());
         }
         return utenti;
     }
@@ -136,7 +136,7 @@ public class GestoreDati {
                 }
             }
         } catch (IOException e) {
-            // File non ancora esistente, ritorna lista vuota
+            System.out.println("Errore durante il caricamento delle proiezioni " + nomeFile + ": " + e.getMessage());
         }
         return proiezioni;
     }
@@ -207,7 +207,7 @@ public class GestoreDati {
                 }
             }
         } catch (IOException e) {
-            // File non ancora esistente, ritorna lista vuota
+            System.out.println("Errore durante il caricamento delle prenotazioni " + nomeFile + ": " + e.getMessage());
         }
         return prenotazioni;
     }

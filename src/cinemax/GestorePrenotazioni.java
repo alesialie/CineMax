@@ -147,4 +147,9 @@ public class GestorePrenotazioni {
         }
         return 0;
     }
+
+    // Metodo da aggiungere dentro GestorePrenotazioni
+    public void salvaPrenotazioni() {
+        GestoreDati.salvaPrenotazioni("prenotazioni.csv", this.prenotazioni);
+    }
 }

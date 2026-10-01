@@ -143,9 +143,9 @@ public class GestoreProiezioni {
                 b = false;
             }
 
-            if (costoMax > 0) {
+            if (costoMassimo > 0) {
                 double costo = p.getCostoBiglietto();
-                if (costo < costoMin || costo > costoMax) {
+                if (costo < costoMinimo || costo > costoMassimo) {
                     b = false;
                 }
             }

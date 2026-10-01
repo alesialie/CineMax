@@ -45,7 +45,12 @@ public class CineMax {
         Film filmProva = new Film("Inception", "Fantascienza", "Christopher Nolan", 2010, 148, 12);
         Proiezione proiezioneProva = new Proiezione(filmProva, LocalDateTime.of(2026, 10, 15, 20, 30), 8.50);
 
-        if (gestoreProiezioni.aggiungiProiezione(proiezioneProva)) {
+        Utente proiezionistaTest = new Utente(
+                "Mario", "Rossi", "mario.proiezionista", "password123",
+                LocalDate.of(1990, 1, 1), "Varese", Ruolo.PROIEZIONISTA
+        );
+
+        if (gestoreProiezioni.aggiungiProiezione(proiezionistaTest, proiezioneProva)) {
             gestoreProiezioni.salvaDati();
             System.out.println("[TEST] Proiezione di 'Inception' aggiunta e salvata correttamente!");
         } else {

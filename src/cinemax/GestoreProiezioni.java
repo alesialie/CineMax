@@ -1,6 +1,5 @@
 package cinemax;
 
-import org.w3c.dom.stylesheets.LinkStyle;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

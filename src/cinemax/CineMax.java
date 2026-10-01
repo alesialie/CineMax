@@ -56,6 +56,37 @@ public class CineMax {
         } else {
             System.out.println("[TEST INFO] Proiezione non aggiunta (sovrapposizione o già presente).");
         }
+
+        // =====================================================================
+        // 3. TEST GESTORE PRENOTAZIONI (caricaPrenotazioni e salvaPrenotazioni)
+        // =====================================================================
+        List<Utente> utentiCaricati = GestoreDati.caricaUtenti("utenti.csv");
+        List<Proiezione> proiezioniAggiornate = GestoreDati.caricaProiezioni("proiezioni.csv");
+
+        List<Prenotazione> prenotazioniCaricate = GestoreDati.caricaPrenotazioni("prenotazioni.csv", utentiCaricati, proiezioniAggiornate);
+        GestorePrenotazioni gestorePrenotazioni = new GestorePrenotazioni(prenotazioniCaricate);
+
+        // Troviamo il primo utente con ruolo CLIENTE disponibile
+        Utente clienteTest = trovaPrimoCliente(utentiCaricati);
+
+        if (clienteTest != null && !proiezioniAggiornate.isEmpty()) {
+            Proiezione proiezioneTest = proiezioniAggiornate.get(0);
+
+            // Generiamo un codice univoco basato sui millisecondi
+            String codiceUnivoco = "PREN-" + System.currentTimeMillis();
+
+            boolean successoPrenotazione = gestorePrenotazioni.effettuaPrenotazione(codiceUnivoco, clienteTest, proiezioneTest, 2);
+
+            if (successoPrenotazione) {
+                gestorePrenotazioni.salvaPrenotazioni();
+                System.out.println("[TEST] Prenotazione effettuata e salvata correttamente in prenotazioni.csv!");
+            } else {
+                System.out.println("[TEST INFO] Impossibile effettuare la prenotazione (posti esauriti o dati non validi).");
+            }
+        } else {
+            System.out.println("[TEST INFO] Nessun utente CLIENTE trovato o nessuna proiezione disponibile per il test prenotazioni.");
+        }
+
         System.out.println("==============================================\n");
 
         // =====================================================================
@@ -90,5 +121,17 @@ public class CineMax {
 
         scanner.close();
         System.out.println("Arrivederci!");
+    }
+
+    /**
+     * Metodo di supporto per cercare il primo utente con ruolo CLIENTE nella lista.
+     */
+    private static Utente trovaPrimoCliente(List<Utente> utenti) {
+        for (Utente u : utenti) {
+            if (u.getRuolo() == Ruolo.CLIENTE) {
+                return u;
+            }
+        }
+        return null;
     }
 }

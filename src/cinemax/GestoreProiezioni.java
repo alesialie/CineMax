@@ -21,11 +21,6 @@ public class GestoreProiezioni {
     /**
      *
      * @param Titolo titolo del film
-     * @param genere     Genere del film.
-     * @param dataInizio Limite inferiore per l'intervallo di date.
-     * @param dataFine   Limite superiore per l'intervallo di date.
-     * @param prezzoMin  Costo minimo del biglietto.
-     * @param prezzoMax  Costo massimo del biglietto
      * @return lista proiezioni trovate
      */
 
@@ -47,7 +42,10 @@ public class GestoreProiezioni {
     }
 
     /**
-     * ricerca film per genere**/
+     * ricerca film per genere
+     * @param Genere genere del film
+     * @return lista proiezini trovate
+     * **/
     public List<Proiezione> cercaGenere(String Genere) {
         List<Proiezione> risultato = new ArrayList<>();
 
@@ -63,7 +61,11 @@ public class GestoreProiezioni {
     }
 
     /**
-     * ricerca per data**/
+     * ricerca per data
+     * @param inizio Limite inferiore per l'intervallo di date.
+     * @param fine Limite superiore per l'intervallo di date.
+     * @return lista proiezioni trovate
+     * **/
     public List<Proiezione> cercaData(LocalDateTime inizio, LocalDateTime fine) {
         List<Proiezione> risultato = new ArrayList<>();
 
@@ -85,6 +87,9 @@ public class GestoreProiezioni {
 
     /**
      * ricerca per costo
+     * @param costoMinimo Costo minimo del biglietto.
+     * @param costoMassimo Costo massimo del biglietto
+     * @return lista proiezioni trovate
      */
     public List<Proiezione> cercaCosto(double costoMinimo, double costoMassimo) {
         List<Proiezione> risultato = new ArrayList<>();
@@ -105,14 +110,14 @@ public class GestoreProiezioni {
      * @param Genere Genere del film.
      * @param inizio Limite inferiore per l'intervallo di date.
      * @param fine Limite superiore per l'intervallo di date.
-     * @param costoMin Costo minimo del biglietto.
-     * @param costoMax Costo massimo del biglietto
+     * @param costoMinimo Costo minimo del biglietto.
+     * @param costoMassimo Costo massimo del biglietto
      * @return lista proiezioni trovate
      */
 
     public List<Proiezione> cercaAvanzata(String Titolo, String Genere,
                                           LocalDateTime inizio, LocalDateTime fine,
-                                          double costoMin, double costoMax) {
+                                          double costoMinimo, double costoMassimo) {
         List<Proiezione> risultato = new ArrayList<>();
 
         for (Proiezione p : proiezioni) {
@@ -153,10 +158,16 @@ public class GestoreProiezioni {
     }
 
     /** aggiunta proiezione
+     * @param utente Corrente utente che prova a fare l'operazione
      * @param nuovaProiezione Proiezione da aggiungere.
      * @return true se aggiunta con successo
      **/
-    public boolean aggiungiProiezione(Proiezione nuovaProiezione) {
+    public boolean aggiungiProiezione(Utente utente, Proiezione nuovaProiezione) {
+
+        if(utente == null || utente.getRuolo() != Ruolo.PROIEZIONISTA){
+            return false;
+        }
+
         if (nuovaProiezione == null) {
             return false;
         }
@@ -169,13 +180,19 @@ public class GestoreProiezioni {
     }
 
     /**
-     * Modifica la data/ora di una proiezione esistente.
+     * Modifica la data/ora di una proiezione esistente
+     * @param utente Corrente utente che prova a fare l'operazione
      * @param proiezioneDaModificare Proiezione da aggiornare.
      * @param nuovaDataOra  Nuova data e ora.
      * @return true se modificata con successo, false altrimenti.
      */
 
-    public boolean modificaProiezione(Proiezione proiezioneDaModificare, LocalDateTime nuovaDataOra) {
+    public boolean modificaProiezione(Utente utente, Proiezione proiezioneDaModificare, LocalDateTime nuovaDataOra) {
+
+        if(utente == null || utente.getRuolo() != Ruolo.PROIEZIONISTA){
+            return false;
+        }
+
         if (proiezioneDaModificare == null || nuovaDataOra == null) {
             return false;
         }
@@ -198,18 +215,21 @@ public class GestoreProiezioni {
     }
     /**
      * Rimuove una proiezione
+     * @param utente Corrente utente che prova a fare l'operazione
      * @param proiezione Proiezione da eliminare.
      * @return true se trovata ed eliminata, false altrimenti.
      */
-    public boolean eliminaProiezione(Proiezione proiezione) {
+    public boolean eliminaProiezione(Utente utente, Proiezione proiezione) {
+
+        if(utente == null || utente.getRuolo() != Ruolo.PROIEZIONISTA){
+            return false;
+        }
+
         if (proiezione == null) {
             return false;
         }
         return proiezioni.remove(proiezione);
     }
-    /**
-     * metodi per collegarsi al gestoreDati
-     */
     /**
      * Salva la lista delle proiezioni richiamando GestoreDati
      */

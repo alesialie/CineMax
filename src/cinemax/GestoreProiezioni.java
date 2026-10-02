@@ -229,6 +229,15 @@ public class GestoreProiezioni {
         }
         return proiezioni.remove(proiezione);
     }
+
+    /**
+     * copia della lista delle proiezioni correnti.
+     * @return lista delle proiezioni
+     */
+    public List<Proiezione> getProiezioni() {
+        return new ArrayList<>(this.proiezioni);
+    }
+
     /**
      * Salva la lista delle proiezioni richiamando GestoreDati
      */

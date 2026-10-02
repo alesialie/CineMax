@@ -127,7 +127,7 @@ public class GestoreUtenti {
      *         {@code null} se le credenziali sono errate, incomplete o l'utente non esiste.
      */
 
-    public Ruolo login(String username, String password) {
+    public Utente login(String username, String password) {
 
         if (username == null || username.isBlank() ||
                 password == null || password.isBlank()) {
@@ -141,7 +141,7 @@ public class GestoreUtenti {
             if (u.getUsername().equalsIgnoreCase(username)) {
 
                 if (u.getPasswordCifrata().equals(passwordCifrataInput)) {
-                    return u.getRuolo();
+                    return u;
                 }
 
                 return null;

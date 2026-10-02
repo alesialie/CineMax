@@ -3,6 +3,7 @@ package cinemax;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.UUID;
@@ -26,6 +27,7 @@ public class CineMax {
         List<Proiezione> proiezioni = GestoreDati.caricaProiezioni("proiezioni.csv");
         GestoreProiezioni gestoreProiezioni = new GestoreProiezioni(proiezioni);
         GestoreUtenti gestoreUtenti = new GestoreUtenti();
+        GestorePrenotazioni gestorePrenotazioni = new GestorePrenotazioni();
 
         // =====================================================================
         // MENU PRINCIPALE
@@ -46,10 +48,10 @@ public class CineMax {
 
             switch (scelta) {
                 case "1":
-                    System.out.println("Login non ancora implementato.");
+                    effettuaLogin(scanner, gestoreUtenti, gestoreProiezioni, gestorePrenotazioni);
                     break;
                 case "2":
-                    System.out.println("Registrazione non ancora implementata.");
+                    effettuaRegistrazione(scanner, gestoreUtenti);
                     break;
                 case "3":
                     mostraLista(gestoreProiezioni.getProiezioni());
@@ -71,7 +73,77 @@ public class CineMax {
     }
 
     /**
-     * menù per la scelta della ricerca
+     * Gestisce la procedura di Login e reindirizza l'utente al menù del suo ruolo
+     * */
+
+    private static void effettuaLogin(Scanner scanner, GestoreUtenti gestoreUtenti, GestoreProiezioni gestoreProiezioni, GestorePrenotazioni gestorePrenotazioni) {
+        System.out.println("\n--- LOGIN ---");
+        System.out.print("Username: ");
+        String username = scanner.nextLine().trim();
+        System.out.print("Password: ");
+        String password = scanner.nextLine().trim();
+
+        Utente utenteLoggato = gestoreUtenti.login(username, password);
+
+        if (utenteLoggato == null) {
+            System.out.println("Credenziali errate o utente non trovato.");
+            return;
+        }
+
+        System.out.println("\nBenvenuto/a " + utenteLoggato.getNome() + " " + utenteLoggato.getCognome() + "!");
+
+        // In base al ruolo indirizziamo l'utente al menu dedicato
+        if (utenteLoggato.getRuolo() == Ruolo.CLIENTE) {
+            menuCliente(scanner, utenteLoggato, gestoreProiezioni, gestorePrenotazioni);
+        } else if (utenteLoggato.getRuolo() == Ruolo.BIGLIETTAIO) {
+            // Se esiste un menu gestore, invocarlo qui
+            System.out.println("Accesso come Bigliettaio.");
+        } else if (utenteLoggato.getRuolo() == Ruolo.PROIEZIONISTA) {
+        System.out.println("Accesso effettuato come Proiezionista.");
+        }
+    }
+
+    /**
+     * Gestisce l'inserimento dei dati e la registrazione di un nuovo cliente.
+     */
+    private static void effettuaRegistrazione(Scanner scanner, GestoreUtenti gestoreUtenti) {
+        System.out.println("\n--- REGISTRAZIONE ---");
+
+        try {
+            System.out.print("Nome: ");
+            String nome = scanner.nextLine().trim();
+
+            System.out.print("Cognome: ");
+            String cognome = scanner.nextLine().trim();
+
+            System.out.print("Username: ");
+            String username = scanner.nextLine().trim();
+
+            System.out.print("Password: ");
+            String password = scanner.nextLine().trim();
+            System.out.print("Data di nascita (GG/MM/AAAA): ");
+            String dataStr = scanner.nextLine().trim();
+
+            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            LocalDate dataNascita = LocalDate.parse(dataStr, fmt);
+
+            System.out.print("Domicilio (opzionale, premere INVIO per saltare): ");
+            String domicilio = scanner.nextLine().trim();
+
+            // Di default, le registrazioni da menu pubblico creano utenti CLIENTE
+            gestoreUtenti.registra(nome, cognome, username, password, dataNascita, domicilio, Ruolo.CLIENTE);
+
+            System.out.println("\nRegistrazione completata con successo! Ora puoi effettuare il login.");
+
+        } catch (DateTimeParseException e) {
+            System.out.println("\nErrore: Formato data non valido. Usare GG/MM/AAAA (es. 15/05/1995).");
+        } catch (IllegalArgumentException e) {
+            System.out.println("\nErrore nella registrazione: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Menù per la scelta della ricerca
      */
     private static void menuRicerca(Scanner scanner, GestoreProiezioni gestore) {
         System.out.println("\n--- RICERCA PROIEZIONI ---");
@@ -81,7 +153,7 @@ public class CineMax {
         System.out.println("0. Torna indietro");
         System.out.print("Scelta criterio: ");
 
-        String scelta = scanner.nextLine();
+        String scelta = scanner.nextLine().trim();
 
         switch (scelta) {
             case "1":
@@ -117,7 +189,7 @@ public class CineMax {
     }
 
     /**
-     * stampa lista proiezioni
+     * Stampa lista proiezioni
      * @param lista lista delle proiezioni mostrate
      */
     private static void mostraLista(List<Proiezione> lista) {
@@ -310,7 +382,4 @@ public class CineMax {
             System.out.println("Impossibile annullare la prenotazione (potrebbe appartenere a un altro utente o essere riferita a una proiezione già passata).");
         }
     }
-
-
-
 }

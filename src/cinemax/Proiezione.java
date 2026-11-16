@@ -1,6 +1,7 @@
 package cinemax;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Rappresenta una proiezione di un {@link Film} in una data e ora precise,
@@ -59,6 +60,20 @@ public class Proiezione {
         LocalDateTime fineB = altra.dataOra.plusMinutes(altra.film.getDurataMinuti());
 
         return inizioA.isBefore(fineB) && inizioB.isBefore(fineA);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Proiezione that = (Proiezione) o;
+        return Objects.equals(film, that.film) &&
+                Objects.equals(dataOra, that.dataOra);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(film, dataOra);
     }
 
     @Override
